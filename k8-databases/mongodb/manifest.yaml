@@ -45,7 +45,9 @@ metadata:
 spec:
   clusterIP: None
   selector:
-    app: nginx
+    app: mongodb
+    project: roboshop
+    tier: db
   ports:
     - port: 27017
       targetPort: 27017
