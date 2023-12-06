@@ -2,6 +2,10 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: mongodb
+  labels:
+    app: mongodb
+    project: roboshop
+    tier: db
 spec:
   selector:
     matchLabels:
