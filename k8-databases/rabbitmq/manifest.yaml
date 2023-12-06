@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rabbitmq
+  # labels:
+  #   app: rabbitmq
+  #   project: roboshop
+  #   tier: db
+spec:
+  selector:
+    matchLabels:
+      app: rabbitmq
+      project: roboshop
+      tier: db
+  serviceName: "rabbitmq"
+  replicas: 1 # by default is 1
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+        project: roboshop
+        tier: db
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers: 
+      - name: rabbitmq
+        image: rabbitmq
+        volumeMounts:
+        - name: rabbitmq
+          mountPath: /data/db
+  volumeClaimTemplates:
+  - metadata:
+      name: rabbitmq
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "roboshop-sc"
+      resources:
+        requests:
+          storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+spec:
+  clusterIP: None
+  selector:
+    app: rabbitmq
+    project: roboshop
+    tier: db
+  ports:
+    - port: 5672
+      targetPort: 5672
+      protocol: TCP
+      name: rabbitmq-port

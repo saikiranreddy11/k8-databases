@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  # labels:
+  #   app: mongodb
+  #   project: roboshop
+  #   tier: db
+spec:
+  selector:
+    matchLabels:
+      app: redis
+      project: roboshop
+      tier: db
+  serviceName: "redis"
+  replicas: 1 # by default is 1
+  template:
+    metadata:
+      labels:
+        app: redis
+        project: roboshop
+        tier: db
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers: 
+      - name: redis
+        image: redis
+        volumeMounts:
+        - name: redis
+          mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: redis
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "roboshop-sc"
+      resources:
+        requests:
+          storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+spec:
+  clusterIP: None
+  selector:
+    app: redis
+    project: roboshop
+    tier: db
+  ports:
+    - port: 6379
+      targetPort: 6379
+      protocol: TCP
+      name: redis-port
